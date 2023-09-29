@@ -2,7 +2,7 @@ from transformers import AutoTokenizer, AutoModelForMultipleChoice, TrainingArgu
 import numpy as np
 import json
 
-from processing_data import DataCollatorForMultipleChoice, show_one, load_dataset, get_encoded_datasets
+from processing_data import DataCollatorForMultipleChoice, show_one, load_data, get_encoded_datasets
 
 def compute_metrics(eval_predictions):
     predictions, label_ids = eval_predictions
@@ -25,19 +25,24 @@ def test(trainer, encoded_datasets):
     predictions = trainer.predict(encoded_datasets["test"])
     return predictions
 
-if __name__=='main':
+if __name__=='__main__':
     ## load config file
-    with open('config.json') as f:
+    with open('config.json', 'r', encoding='utf-8') as f:
         config = json.load(f)
+    # print(config)
 
     ## load model and tokenzier
-    tokenizer = AutoTokenizer.from_pretrained(config['model_ckpt'], use_fast=True)
+    tokenizer = AutoTokenizer.from_pretrained(config['model_ckpt'])
     model = AutoModelForMultipleChoice.from_pretrained(config['model_ckpt'])
 
-    ## load dataset
-    dataset = load_dataset(config)
-    encoded_datasets = get_encoded_datasets(dataset)
+    # print(tokenizer)
+    # print(model)
 
+    ## load dataset
+    dataset = load_data(config)
+    encoded_datasets = get_encoded_datasets(dataset)
+    print(encoded_datasets["train"][0])
+    
     ## train
     model_name = config['model_ckpt'].split("/")[-1]
     model_dir=f"{model_name}-finetuned"
