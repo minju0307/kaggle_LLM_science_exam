@@ -1,4 +1,4 @@
-정from transformers import AutoTokenizer, AutoModelForMultipleChoice, TrainingArguments, Trainer
+from transformers import AutoTokenizer, AutoModelForMultipleChoice, TrainingArguments, Trainer
 import numpy as np
 import json
 import argparse
