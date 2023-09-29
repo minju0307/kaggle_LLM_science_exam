@@ -1,5 +1,6 @@
 from transformers import AutoTokenizer, AutoModelForMultipleChoice, TrainingArguments, Trainer
 import numpy as np
+import json
 
 from processing_data import DataCollatorForMultipleChoice, show_one, load_dataset, get_encoded_datasets
 
@@ -25,16 +26,9 @@ def test(trainer, encoded_datasets):
     return predictions
 
 if __name__=='main':
-    ## config_dict
-    config = {
-        "model_ckpt": 'allenai / longformer - base - 4096',
-        "train_datasets": ['../dataset/MMLU_train_set.csv', '../dataset/MMLU_physics_set.csv', '../dataset/MMLU_science_set.csv'],
-        "dev_datasets" : ['../dataset/MMLU_dev_set.csv'],
-        "batch_size": 16,
-        "learning_rate" : 5e-5,
-        "num_train_epoch" : 10,
-        "weight_decay" : 0.01
-    }
+    ## load config file
+    with open('config.json') as f:
+        config = json.load(f)
 
     ## load model and tokenzier
     tokenizer = AutoTokenizer.from_pretrained(config['model_ckpt'], use_fast=True)

@@ -4,8 +4,7 @@ from dataclasses import dataclass
 from transformers.tokenization_utils_base import PreTrainedTokenizerBase, PaddingStrategy
 from typing import Optional, Union
 import torch
-
-from main import config
+import json
 
 ## showing dataset function
 def show_one(example):
@@ -15,6 +14,10 @@ def show_one(example):
     print(f"  C - {example['C']}")
     print(f"  D - {example['D']}")
     print(f"\nGround truth: option {example['answer']}")
+
+## load config file
+with open('config.json') as f:
+    config = json.load(f)
 
 ## load dataset
 def load_dataset(config):
