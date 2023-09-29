@@ -1,6 +1,7 @@
-from transformers import AutoTokenizer, AutoModelForMultipleChoice, TrainingArguments, Trainer
+정from transformers import AutoTokenizer, AutoModelForMultipleChoice, TrainingArguments, Trainer
 import numpy as np
 import json
+import argparse
 
 from processing_data import DataCollatorForMultipleChoice, show_one, load_data, get_encoded_datasets
 
@@ -9,7 +10,7 @@ def compute_metrics(eval_predictions):
     preds = np.argmax(predictions, axis=1)
     return {"accuracy": (preds == label_ids).astype(np.float32).mean().item()}
 
-def train (args, encoded_datasets, tokenizer):
+def train (args, encoded_datasets, tokenizer, model):
     trainer = Trainer(model,
             args,
             train_dataset=encoded_datasets["train"],
@@ -25,9 +26,10 @@ def test(trainer, encoded_datasets):
     predictions = trainer.predict(encoded_datasets["test"])
     return predictions
 
-if __name__=='__main__':
+
+def main(cli_args):
     ## load config file
-    with open('config.json', 'r', encoding='utf-8') as f:
+    with open(f'{cli_args.config}', 'r', encoding='utf-8') as f:
         config = json.load(f)
     # print(config)
 
@@ -40,12 +42,12 @@ if __name__=='__main__':
 
     ## load dataset
     dataset = load_data(config)
-    encoded_datasets = get_encoded_datasets(dataset)
+    encoded_datasets = get_encoded_datasets(dataset, config)
     print(encoded_datasets["train"][0])
     
     ## train
     model_name = config['model_ckpt'].split("/")[-1]
-    model_dir=f"{model_name}-finetuned"
+    model_dir=f"{cli_args.output_dir}"
     args = TrainingArguments(
         output_dir = model_dir,
         evaluation_strategy="epoch",
@@ -59,7 +61,15 @@ if __name__=='__main__':
         report_to='none'
     )
 
-    trainer = train(args, encoded_datasets, tokenizer)
+    trainer = train(args, encoded_datasets, tokenizer, model)
 
     ## test
     evaluation_prediction = test(trainer, encoded_datasets)
+
+
+if __name__ == '__main__':
+    cli_parser = argparse.ArgumentParser()
+    cli_parser.add_argument("--config", type=str, required=True)
+    cli_parser.add_argument("--output_dir", type=str, required=True)
+    cli_args = cli_parser.parse_args()
+    main(cli_args)
