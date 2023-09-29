@@ -15,43 +15,38 @@ def show_one(example):
     print(f"  D - {example['D']}")
     print(f"\nGround truth: option {example['answer']}")
 
-## load config file
-with open('config.json') as f:
-    config = json.load(f)
-
 ## load dataset
 def load_data(config):
     dataset = load_dataset('csv', data_files={'train':config['train_datasets'], 'test':config['dev_datasets']}, keep_default_na=False)
     return dataset
 
-## load tokenizer
-tokenizer = AutoTokenizer.from_pretrained(config['model_ckpt'])
-
 ## preprocessing dataset
-options = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
-def preprocess_function(examples):
-    # Repeat each questions four times to go with the four possibilities of second sentences.
-    first_sentences = [[context] * 4 for context in examples["question"]]
+def get_encoded_datasets(dataset, config):
+    tokenizer=AutoTokenizer.from_pretrained(config['model_ckpt'])
+    options = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
 
-    # Grab all option sentences possible for each question.
-    second_sentences = [[f"{examples[option][i]}" for option in options] for i in range(len(examples['question']))]
+    def preprocess_function(examples):
+        # Repeat each questions four times to go with the four possibilities of second sentences.
+        first_sentences = [[context] * 4 for context in examples["question"]]
 
-    # Flatten everything
-    first_sentences = sum(first_sentences, [])
-    second_sentences = sum(second_sentences, [])
+        # Grab all option sentences possible for each question.
+        second_sentences = [[f"{examples[option][i]}" for option in options] for i in range(len(examples['question']))]
 
-    # Tokenize
-    tokenized_examples = tokenizer(first_sentences, second_sentences, truncation=True)
+        # Flatten everything
+        first_sentences = sum(first_sentences, [])
+        second_sentences = sum(second_sentences, [])
 
-    # label idx
-    encoded_labels = [options[f'{label}'] for label in examples['answer']]
+        # Tokenize
+        tokenized_examples = tokenizer(first_sentences, second_sentences, truncation=True)
 
-    # Un-flatten
-    output_dict = {k: [v[i:i + 4] for i in range(0, len(v), 4)] for k, v in tokenized_examples.items()}
-    output_dict['label'] = encoded_labels
-    return output_dict
+        # label idx
+        encoded_labels = [options[f'{label}'] for label in examples['answer']]
 
-def get_encoded_datasets(dataset):
+        # Un-flatten
+        output_dict = {k: [v[i:i + 4] for i in range(0, len(v), 4)] for k, v in tokenized_examples.items()}
+        output_dict['label'] = encoded_labels
+        return output_dict
+
     encoded_datasets = dataset.map(preprocess_function, batched=True, remove_columns=['question', 'A', 'B', 'C', 'D', 'answer'])
     return encoded_datasets
 
