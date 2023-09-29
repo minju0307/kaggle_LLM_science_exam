@@ -20,13 +20,12 @@ with open('config.json') as f:
     config = json.load(f)
 
 ## load dataset
-def load_dataset(config):
-    dataset = load_dataset('csv', data_files={'train':config['train_datasets'], 'test':config['dev_datasets']})
+def load_data(config):
+    dataset = load_dataset('csv', data_files={'train':config['train_datasets'], 'test':config['dev_datasets']}, keep_default_na=False)
     return dataset
 
 ## load tokenizer
-model_ckpt = config['model_ckpt']
-tokenizer = AutoTokenizer.from_pretrained(model_ckpt, use_fast=True)
+tokenizer = AutoTokenizer.from_pretrained(config['model_ckpt'])
 
 ## preprocessing dataset
 options = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
@@ -53,7 +52,7 @@ def preprocess_function(examples):
     return output_dict
 
 def get_encoded_datasets(dataset):
-    encoded_datasets = dataset.map(preprocess_function, batched=False)
+    encoded_datasets = dataset.map(preprocess_function, batched=True, remove_columns=['question', 'A', 'B', 'C', 'D', 'answer'])
     return encoded_datasets
 
 @dataclass
