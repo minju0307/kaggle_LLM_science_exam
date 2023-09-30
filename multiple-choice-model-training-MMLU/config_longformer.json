@@ -1,0 +1,10 @@
+{
+    "model_ckpt": "allenai/longformer-base-4096",
+    "train_datasets": ["../dataset/MMLU_sampling_train_set.csv"],
+    "dev_datasets" : ["../dataset/MMLU_dev_set.csv"],
+    "batch_size": 2,
+    "max_length": 1024,
+    "learning_rate" : 5e-5,
+    "num_train_epoch" : 5,
+    "weight_decay" : 0.01
+}
