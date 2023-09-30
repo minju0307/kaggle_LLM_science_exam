@@ -37,7 +37,7 @@ def get_encoded_datasets(dataset, config):
         second_sentences = sum(second_sentences, [])
 
         # Tokenize
-        tokenized_examples = tokenizer(first_sentences, second_sentences, truncation=True)
+        tokenized_examples = tokenizer(first_sentences, second_sentences, truncation=True, max_length=config['max_length'])
 
         # label idx
         encoded_labels = [options[f'{label}'] for label in examples['answer']]
