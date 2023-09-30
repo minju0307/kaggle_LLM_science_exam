@@ -2,6 +2,7 @@ from transformers import AutoTokenizer, AutoModelForMultipleChoice, TrainingArgu
 import numpy as np
 import json
 import argparse
+import torch
 
 from processing_data import DataCollatorForMultipleChoice, show_one, load_data, get_encoded_datasets
 
@@ -35,7 +36,8 @@ def main(cli_args):
 
     ## load model and tokenzier
     tokenizer = AutoTokenizer.from_pretrained(config['model_ckpt'])
-    model = AutoModelForMultipleChoice.from_pretrained(config['model_ckpt'])
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = AutoModelForMultipleChoice.from_pretrained(config['model_ckpt']).to(device)
 
     # print(tokenizer)
     # print(model)
