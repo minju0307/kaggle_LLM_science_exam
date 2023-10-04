@@ -29,7 +29,11 @@ def get_encoded_datasets(dataset, config):
 
     def preprocess_function(examples):
         # Repeat each questions four times to go with the four possibilities of second sentences.
-        first_sentences = [[context] * 5 for context in examples["prompt"]]
+
+        prompt_context=[]
+        for idx, prompt in enumerate(examples['prompt']):
+            prompt_context.append('Question: '+prompt+'\n'+'Context: '+examples['context'][idx])
+        first_sentences = [[context[:2000]] * 5 for context in prompt_context]
 
         # Grab all option sentences possible for each question.
         second_sentences=[]
@@ -42,8 +46,6 @@ def get_encoded_datasets(dataset, config):
             chunk.append(examples['E'][idx])
             second_sentences.append(chunk)
         
-        assert len(first_sentences) == 200
-
         # Flatten everything
         first_sentences = sum(first_sentences, [])
         second_sentences = sum(second_sentences, [])
@@ -68,7 +70,7 @@ def get_encoded_datasets(dataset, config):
         return output_dict
 
 
-    encoded_datasets = dataset.map(preprocess_function, batched=True, remove_columns=['id', 'prompt', 'A', 'B', 'C', 'D', 'E', 'answer'])
+    encoded_datasets = dataset.map(preprocess_function, batched=True, remove_columns=['prompt', 'context', 'A', 'B', 'C', 'D', 'E', 'answer'])
     return encoded_datasets
 
 @dataclass
