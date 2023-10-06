@@ -1,7 +1,7 @@
 {
     "model_ckpt": "microsoft/deberta-v3-base",
-    "train_datasets": ["../context_with_dataset/train.csv","../context_with_dataset/15k_gpt3.5-turbo.csv","../context_with_dataset/5900_examples.csv","../context_with_dataset/6000_train_examples.csv","../context_with_dataset/extra_train_set.csv", "../context_with_dataset/stem_1k_v1.csv", "../context_with_dataset/train.csv"],
-    "dev_datasets" : ["../context_with_dataset/train.csv", "../context_with_dataset/stem_1k_v1.csv"],
+    "train_datasets": ["../context_with_dataset/train.csv","../context_with_dataset/15k_gpt3.5-turbo.csv","../context_with_dataset/5900_examples.csv","../context_with_dataset/6000_train_examples.csv","../context_with_dataset/extra_train_set.csv", "../context_with_dataset/stem_1k_v1.csv"],
+    "dev_datasets" : ["../context_with_dataset/train.csv"],
     "batch_size": 4,
     "max_length": 2048,
     "learning_rate" : 5e-5,
