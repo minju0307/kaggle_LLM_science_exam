@@ -3,6 +3,7 @@ import numpy as np
 import json
 import argparse
 import torch
+import wandb
 
 from processing_data import DataCollatorForMultipleChoice, show_one, load_data, get_encoded_datasets
 
@@ -50,6 +51,9 @@ def main(cli_args):
     ## train
     model_name = config['model_ckpt'].split("/")[-1]
     model_dir=f"{cli_args.output_dir}"
+
+    wandb.init(project='multiple-choice-model-training')
+
     args = TrainingArguments(
         output_dir = model_dir,
         evaluation_strategy="epoch",
@@ -60,7 +64,7 @@ def main(cli_args):
         per_device_eval_batch_size=config['batch_size'],
         num_train_epochs=config['num_train_epoch'],
         weight_decay=config['weight_decay'],
-        report_to='none'
+        report_to='wandb'
     )
 
     trainer = train(args, encoded_datasets, tokenizer, model)
